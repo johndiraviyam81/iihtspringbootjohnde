@@ -17,7 +17,7 @@ import com.subjectsbooks.app.model.BookDTO;
 import com.subjectsbooks.app.model.SubjectDTO;
 import com.subjectsbooks.app.entity.SubjectVO;
 
-import org.hibernate.Session;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

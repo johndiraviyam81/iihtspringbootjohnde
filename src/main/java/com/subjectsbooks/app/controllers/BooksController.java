@@ -47,8 +47,11 @@ public class BooksController {
 	@RequestMapping(value = "/searchForAbook", method = RequestMethod.GET)
 	public String searchForAbook(Model model)
 	{
+		List<BookDTO> bookList=new ArrayList<>();
 		
-		model.addAttribute("books",books.getAllBooks() );
+		bookList=books.getAllBooks();
+		
+		model.addAttribute("books",bookList );
 		return "searchForAbook";
 	}
 	

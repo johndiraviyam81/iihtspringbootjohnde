@@ -21,11 +21,11 @@ public class BooksSubjectsApplicationTests {
 			
 	/**
 	 * Main.
-	
+	*/
 	@Test
 	public void main() {
 		 BooksSubjectsApplication.main(new String[] {});
-	   }*/
+	   }
 	
 
 }

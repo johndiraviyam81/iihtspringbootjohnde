@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
+import com.subjectsbooks.app.model.SubjectDTO;
 import com.subjectsbooks.app.repositories.BookReferenceVORepository;
 import com.subjectsbooks.app.repositories.SubjectVORepository;
 
@@ -43,11 +44,26 @@ class SubjectsServiceImplTest {
 	
 	private MockMvc mvc;
 	
+	List<SubjectDTO> subjectDTOList=new ArrayList<>();
+
+	
+	SubjectDTO subjectDTO1 = new SubjectDTO();
+	
+	SubjectDTO subjectDTO2 = new SubjectDTO();
+	
+	SubjectDTO subjectDTO3 = new SubjectDTO();
+	
 
 	@BeforeEach
 	void setUp() throws Exception {
 		subjectsService=new SubjectsServiceImpl();
 		mvc = MockMvcBuilders.standaloneSetup(subjectsService).build();
+		this.subjectDTO1=setupSujectDTO("34501","Computer neworks", "345","1101");
+		this.subjectDTO2=setupSujectDTO("34502","Software engineering neworks", "45","1102");
+		this.subjectDTO3=setupSujectDTO("34503","Graphics AI", "34","1101,1103");
+		this.subjectDTOList.add(this.subjectDTO1);
+		this.subjectDTOList.add(this.subjectDTO2);
+		this.subjectDTOList.add(this.subjectDTO3);
 	}
 
  
@@ -77,4 +93,15 @@ class SubjectsServiceImplTest {
 		assertTrue(true);
 	}
 
+	private SubjectDTO setupSujectDTO(String subjectId,String subTitle, String duration,String bookId)
+	{
+		SubjectDTO subjectdto=new SubjectDTO();
+		
+		subjectdto.setBookId(bookId);
+		subjectdto.setDurationInHours(duration);
+		subjectdto.setSubjectId(subjectId);
+		subjectdto.setSubtitle(subTitle);
+		
+		return subjectdto;
+	}
 }
