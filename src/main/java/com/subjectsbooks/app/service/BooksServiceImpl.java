@@ -33,13 +33,26 @@ public class BooksServiceImpl implements BooksService {
 	{
 		
 		List<BookDTO> allBooks=new ArrayList<BookDTO>();
-		List<BookVO> bookRecords= bookRepository.findAll();
-			for(BookVO bookVO : bookRecords) {
-						
+		
+		List<BookVO> bookRecords=new ArrayList<BookVO>();
+		try
+		{
+		 bookRecords= bookRepository.findAll();
+		 if(bookRecords!=null && bookRecords.size()>0)
+		 {
+			for(BookVO bookVO : bookRecords) 
+			{
 				allBooks.add(mapbookdto(bookVO));				
-					}
-					// TODO Auto-generated method stub
-					return allBooks;
+			}
+		 }
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+					
+					
+			return allBooks;
 	}
 
 	@Override

@@ -47,9 +47,20 @@ public class BooksController {
 	@RequestMapping(value = "/searchForAbook", method = RequestMethod.GET)
 	public String searchForAbook(Model model)
 	{
-		List<BookDTO> bookList=new ArrayList<>();
-		
-		bookList=books.getAllBooks();
+		List<BookDTO> bookList=new ArrayList<BookDTO>();
+		try
+		{		
+			bookList=books.getAllBooks();
+			if(bookList.size()<=0)
+			{
+				BookDTO bookDtoNull=new BookDTO();
+				bookList.add(bookDtoNull);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 		model.addAttribute("books",bookList );
 		return "searchForAbook";
@@ -107,14 +118,15 @@ public class BooksController {
 	public String addaBookSave(@ModelAttribute("bookrecord") BookDTO bookrecord,Model model)
 	{
 		
-		if(bookrecord!=null)
-		if(books.save(bookrecord))		
-		model.addAttribute("message","Book has been added successfully" );
-		
+	
+		if(bookrecord!=null && books.save(bookrecord))		
+		{
+			model.addAttribute("message","Book has been added successfully" );
+		}
 		BookDTO bookrecord1=new BookDTO();
 		model.addAttribute("bookrecord",bookrecord1 );
 		
-		return "addabook";
+		return "addaBook";
 	}
 	
 	/**
@@ -148,7 +160,7 @@ public class BooksController {
 		BookDTO bookrecord=new BookDTO();
 		model.addAttribute("bookrecord",bookrecord );
 		
-		return "addabook";
+		return "addaBook";
 	}
 	
 

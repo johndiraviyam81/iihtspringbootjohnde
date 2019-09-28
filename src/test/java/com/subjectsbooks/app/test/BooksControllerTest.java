@@ -2,6 +2,10 @@ package com.subjectsbooks.app.test;
 
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -17,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -66,35 +71,31 @@ class BooksControllerTest {
 		this.bookDTOList.add(this.bookDTO3);
 		this.bookDTOList.add(this.bookDTO4);
 	}
-
 	
 	
-	
-
 	@Test
 	final void testSearchForAbook() {
-	 
-		when(booksService.getAllBooks()).thenReturn(this.bookDTOList);
-
-
-		/*
 			try {
 			
 				MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/books/searchForAbook");
-				
+				when(booksService.getAllBooks()).thenReturn(bookDTOList);
 				mvc.perform(requestBuilder)
 				.andExpect(status().isOk())
 				.andExpect(view().name("searchForAbook"))
 				.andExpect(forwardedUrl("/WEB-INF/jsp/searchForAbook.jsp"))
-				.andExpect(model().attribute("books", this.bookDTOList));
+				.andExpect(model().attribute("books", bookDTOList));
+				
+				 verify(booksService, times(1)).getAllBooks();
+			        verifyNoMoreInteractions(booksService);		
+			    	assertEquals(4,bookDTOList.size());	
 	          
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
 			
 		
-		assertEquals(4,this.bookDTOList.size());		
+		
 	}
 
 
@@ -103,12 +104,9 @@ class BooksControllerTest {
 
 	@Test
 	final void testDeleteABook() {
-	when(booksService.getAllBooks()).thenReturn(this.bookDTOList);
-
-
-		
-	/*	try {
-			Model model = null;
+	
+	try {
+		when(booksService.getAllBooks()).thenReturn(bookDTOList);
 			MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/books/deleteABook");
 			
 			mvc.perform(requestBuilder)
@@ -116,24 +114,29 @@ class BooksControllerTest {
 			.andExpect(view().name("deleteABook"))
 			.andExpect(forwardedUrl("/WEB-INF/jsp/deleteABook.jsp"))
 			.andExpect(model().attribute("books", this.bookDTOList));
+			 verify(booksService, times(1)).getAllBooks();
+		        verifyNoMoreInteractions(booksService);	
+			assertTrue(true);
           
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		*/
-	assertTrue(true);
+		
+
 	}
 
 	@Test
 	final void testDeleteABookDelete() {
-		when(booksService.getAllBooks()).thenReturn(this.bookDTOList);
-		long bookId=Long.parseLong("1101");
-		when(booksService.delete(bookId)).thenReturn(true);
+		
 
 		String message="Record has been successfully deleted";
-			/*	
+				
 				try {
+					when(booksService.getAllBooks()).thenReturn(bookDTOList);
+					this.bookDTOList.remove(4);
+					long bookId=Long.parseLong("1104");
+					when(booksService.delete(bookId)).thenReturn(true);
 					Model model = null;
 					MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/books/deleteABookDelete/{bookIdStr}","1101");
 					
@@ -141,41 +144,106 @@ class BooksControllerTest {
 					.andExpect(status().isOk())
 					.andExpect(view().name("deleteABook"))
 					.andExpect(forwardedUrl("/WEB-INF/jsp/deleteABook.jsp"))
-					.andExpect(model().attribute("books", this.bookDTOList))
+					.andExpect(model().attribute("books", bookDTOList))
 					.andExpect(model().attribute("message", message));
+					assertEquals(3,bookDTOList);
+					 verify(booksService, times(1)).getAllBooks();
+				        verifyNoMoreInteractions(booksService);
 		          
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-		*/
+		 
 	}
 
 	@Test
 	final void testAddaBookSave() {
-		BookDTO bookrecord=bookDTO4;
+			
 		
-		when(booksService.save(bookrecord)).thenReturn(true);
+		try {
+			BookDTO bookrecord=bookDTO4;
+			when(booksService.save(bookrecord)).thenReturn(this.bookDTOList.add(bookrecord));
+					
+			MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/books/addaBookSave")
+					.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+			        .param("bookId", bookrecord.getBookId())
+			        .param("price", bookrecord.getPrice())
+			        .param("publishedDate", bookrecord.getPublishDate())
+			        .param("title", bookrecord.getPrice())
+			        .param("volume", bookrecord.getVolume())
+			        .sessionAttr("bookrecord", bookrecord);	
+			mvc.perform(requestBuilder)
+			.andExpect(status().isAccepted())
+			.andExpect(view().name("addabook"))
+			.andExpect(forwardedUrl("/WEB-INF/jsp/addabook.jsp"))
+			.andExpect(model().attribute("bookrecord", bookrecord))
+			.andExpect(model().attribute("message", "Book has been added successfully"));
+			verifyZeroInteractions(booksService);
+			assertEquals(4,bookDTOList);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-				assertTrue(true);
+		
 	}
 
 	@Test
 	final void testSearchabook() {
 		
+		try {
 		long bookId=Long.parseLong("1101");
 		 
 		when(booksService.find(bookId)).thenReturn(bookDTO1);
 		List<BookDTO> bookDTOListfindrecord = new ArrayList<>();
 		bookDTOListfindrecord.add(bookDTO1);
 	
-		assertEquals(1,bookDTOListfindrecord.size());
+		
+		
+		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/books/searchabook")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+		        .param("bookId","1101")		      
+		        .sessionAttr("bookrecord", new BookDTO());
+		
+		when(booksService.getAllBooks()).thenReturn(bookDTOList);
+		
+			mvc.perform(requestBuilder)
+			.andExpect(status().isOk())
+			.andExpect(view().name("searchForAbook"))
+			.andExpect(forwardedUrl("/WEB-INF/jsp/searchForAbook.jsp"))
+			.andExpect(model().attribute("books", bookDTOListfindrecord));
+		
+		
+		 verify(booksService, times(1)).find(bookId);
+	        verifyNoMoreInteractions(booksService);		
+	        assertEquals(1,bookDTOListfindrecord.size());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    	
 	}
 
 	@Test
 	final void testAddaBook() {
 	
+		try {
 		assertTrue(true);
+		
+		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/books/addaBook");	
+		
+			mvc.perform(requestBuilder)
+			.andExpect(status().isOk())
+			.andExpect(view().name("addaBook"))
+			.andExpect(forwardedUrl("/WEB-INF/jsp/addaBook.jsp"))
+			.andExpect(model().attribute("bookrecord", new BookDTO()));
+			verifyZeroInteractions(booksService);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	 
 	}
 	

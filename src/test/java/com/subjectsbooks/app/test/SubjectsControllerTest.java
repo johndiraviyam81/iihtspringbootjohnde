@@ -3,6 +3,10 @@ package com.subjectsbooks.app.test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -18,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -69,40 +74,40 @@ class SubjectsControllerTest {
 	@Test
 	final void testDeleteaSubject() {
 
-		when(subjectService.getAllSubjects()).thenReturn(this.subjectDTOList);
-	 /*
-	
-				
 				try {
-					Model model = null;
+				
 					MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/subjects/deleteaSubject");
-					
+					when(subjectService.getAllSubjects()).thenReturn(subjectDTOList);
 					mvc.perform(requestBuilder)
 					.andExpect(status().isOk())
 					.andExpect(view().name("deleteaSubject"))
 					.andExpect(forwardedUrl("/WEB-INF/jsp/deleteaSubject.jsp"))
-					.andExpect(model().attribute("subjects", this.subjectDTOList));
+					.andExpect(model().attribute("subjects", subjectDTOList));
+						 verify(subjectService, times(1)).getAllSubjects();
+			        verifyNoMoreInteractions(subjectService);		
+			    	assertEquals(3,subjectDTOList.size());	
 		          
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				*/
+			
 	}
 
 
 	@Test
-	final void testDeleteaSubjectDelete() {
-
-		when(subjectService.getAllSubjects()).thenReturn(this.subjectDTOList);
-		long subjectId=Long.parseLong("34501");
-		when(subjectService.delete(subjectId)).thenReturn(true);
-
-		String message="Record has been successfully deleted";
-				/*
+	final void testDeleteaSubjectDelete() {		
+				
 				try {
-					Model model = null;
-					MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/subjects/deleteaSubjectDelete/{subjectIdStr}","34501");
+				
+					long subjectId=Long.parseLong("34503");
+					MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/subjects/deleteaSubjectDelete/{subjectIdStr}","34503");
+								
+					when(subjectService.delete(subjectId)).thenReturn(true);
+					this.subjectDTOList.remove(2);
+					when(subjectService.getAllSubjects()).thenReturn(this.subjectDTOList);
+					assertEquals(2,this.subjectDTOList.size());
+					String message="Record has been successfully deleted";
 					
 					mvc.perform(requestBuilder)
 					.andExpect(status().isOk())
@@ -110,77 +115,126 @@ class SubjectsControllerTest {
 					.andExpect(forwardedUrl("/WEB-INF/jsp/deleteaSubject.jsp"))
 					.andExpect(model().attribute("subjects", this.subjectDTOList))
 					.andExpect(model().attribute("message", message));
+					 verify(subjectService, times(1)).delete(subjectId);
+				        verifyNoMoreInteractions(subjectService);
 		          
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}*/
-				assertTrue(true);
+				} 
+			
 	}
 
 	
 
 	@Test
 	final void testSearchForaSubject() {
-
-		when(subjectService.getAllSubjects()).thenReturn(this.subjectDTOList);
-		 
-	/*	
-		
+	
 		try {
-			Model model = null;
+		
 			MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/subjects/searchForaSubject");
+			when(subjectService.getAllSubjects()).thenReturn(this.subjectDTOList);
 			
 			mvc.perform(requestBuilder)
 			.andExpect(status().isOk())
 			.andExpect(view().name("searchForASubject"))
 			.andExpect(forwardedUrl("/WEB-INF/jsp/searchForASubject.jsp"))
 			.andExpect(model().attribute("subjects", this.subjectDTOList));
+			 verify(subjectService, times(1)).getAllSubjects();
+		        verifyNoMoreInteractions(subjectService);
+		        assertEquals(2,this.subjectDTOList.size());
           
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-		assertTrue(true);
+		} 
+		
 	}
 
 	@Test
-	final void testSearchasubject() {
-		
-		List<SubjectDTO> subjectRecordset=new ArrayList<>();
-		subjectRecordset.add(subjectDTO1);		
-		String title="Computer neworks";		 
-		when(subjectService.search(title)).thenReturn(subjectRecordset);		
-	
-		assertEquals(1,subjectRecordset.size());
+	final void testSearchasubject() {		
+
+		try {
+			
+			List<SubjectDTO> subjectRecordset=new ArrayList<>();
+			subjectRecordset.add(subjectDTO1);		
+			String title="Computer neworks";	
+			MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/subjects/searchasubject")
+					.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+			        .param("title",title)		      
+			        .sessionAttr("subjectRecord", new SubjectDTO());
+		 
+			 
+			when(subjectService.search(title)).thenReturn(subjectRecordset);
+			mvc.perform(requestBuilder)
+			.andExpect(status().isAccepted())
+			.andExpect(view().name("searchForASubject"))
+			.andExpect(forwardedUrl("/WEB-INF/jsp/searchForASubject.jsp"))
+			.andExpect(model().attribute("subjects", subjectRecordset));
+			 verify(subjectService, times(1)).search(title);
+		        verifyNoMoreInteractions(subjectService);
+		        assertEquals(1,subjectRecordset.size());
+          
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		
 	}
 
 	@Test
 	final void testAddaSubjectSave() {
-		SubjectDTO subjectrecord=subjectDTO3;
+	 
 		
-		when(subjectService.save(subjectrecord)).thenReturn(true);		
-				assertTrue(true);
+				
+				
+				try {
+
+					MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/subjects/addaSubjectSave")
+							.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+							.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+					        .param("subjectId",subjectDTO3.getSubjectId())	
+					        .param("subTitle",subjectDTO3.getSubtitle())	
+					        .param("durationInHours",subjectDTO3.getDurationInHours())	
+					        .param("bookId",subjectDTO3.getBookId())	
+					        .sessionAttr("subjectRecord", subjectDTO3);
+					when(subjectService.save(subjectDTO3)).thenReturn(true);
+					this.subjectDTOList.add(subjectDTO3);
+					mvc.perform(requestBuilder)
+					.andExpect(status().isOk())
+					.andExpect(view().name("addaSubject"))
+					.andExpect(forwardedUrl("/WEB-INF/jsp/addaSubject.jsp"))
+					.andExpect(model().attribute("subjectrecord", subjectDTO3));
+					 
+					verifyZeroInteractions(subjectService);
+			        assertEquals(3,this.subjectDTOList.size());
+					 
+				 
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	}
 
 	@Test
 	final void testAddaSubject() {
-		/*SubjectDTO subjectrecord=new SubjectDTO();
+		
 		try {
-			Model model = null;
+			SubjectDTO subjectrecord=new SubjectDTO();
 			MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/subjects/addaSubject");
 			
 			mvc.perform(requestBuilder)
 			.andExpect(status().isOk())
 			.andExpect(view().name("addaSubject"))
-			.andExpect(forwardedUrl("addaSubject"));
-          
+			.andExpect(forwardedUrl("/WEB-INF/jsp/addaSubject.jsp"))
+			.andExpect(model().attribute("bookrecord", subjectrecord));
+			verifyZeroInteractions(subjectService);
+			assertTrue(true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-		assertTrue(true);
+		}
+		
 	}
 	
 	private SubjectDTO setupSujectDTO(String subjectId,String subTitle, String duration,String bookId)
